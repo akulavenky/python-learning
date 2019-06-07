@@ -1,0 +1,8 @@
+{% for object in object_list %}
+<li>
+	<a href='/blog/{{ object.id }}'>{{ object.title }}</a> # another way to 
+	<a href='{% url "blog:detail" object.id %}'>{{ object.title }}</a> # another way to (require namespace register at portal/urls.py)
+	<a href='{{ object.get_absolute_url }}'>{{ object.title }}</a> # another way to 
+	
+</li>
+{% endfor %}
