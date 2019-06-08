@@ -1,10 +1,19 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from .models import PostModel
 
 
 # Create your views here.
+
+def post_model_detail_view(request, id=None):
+    #obj = PostModel.objects.get(id=1)
+    obj = get_object_or_404(PostModel, id=id)
+    context = {
+        "object": obj
+    }
+    template = "blog/detail-view.html"
+    return render(request, template, context)
 
 def post_model_list_view(request):
     qs = PostModel.objects.all()
