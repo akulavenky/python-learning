@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.contrib import messages
 from .models import PostModel
 from .forms import PostModelForm
@@ -72,9 +73,16 @@ def post_model_delete_view(request, id=None):
     return render(request, template, context)
 
 def post_model_list_view(request):
+    query = request.GET.get("q", None)
     qs = PostModel.objects.all()
+    if query is not None:
+        qs = qs.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(slug__icontains=query)
+            )
     context = {
-        "object_list": qs
+        "object_list": qs,
     }
     template = "blog/list-view.html"
     return render(request, template, context)
