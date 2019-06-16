@@ -23,11 +23,13 @@ def post_model_create_view(request):
         obj = form.save(commit=False)
         obj.save() 
         messages.success(request, "Create a new blog post")
+        #return HttpResponseRedirect("/blog/{num}".format(num=obj.id))
         context = {
             "form": PostModelForm()
         }
         #If you don't want to redirect the page after form creation comment the below line
         #return HttpResponseRedirect("/blog/{num}".format(num=obj.id))
+    
     template = "blog/create-view.html"
     return render(request, template, context)
 
@@ -54,6 +56,19 @@ def post_model_detail_view(request, id=None):
         "object": obj
     }
     template = "blog/detail-view.html"
+    return render(request, template, context)
+
+def post_model_delete_view(request, id=None):
+    #obj = PostModel.objects.get(id=1)
+    obj = get_object_or_404(PostModel, id=id)
+    if request.method == "POST":
+        obj.delete()
+        messages.success(request, "Post deleted")
+        return HttpResponseRedirect("/blog/")
+    context = {
+        "object": obj,
+    }
+    template = "blog/delete-view.html"
     return render(request, template, context)
 
 def post_model_list_view(request):
