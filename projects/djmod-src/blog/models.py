@@ -3,6 +3,8 @@ from django.utils.encoding import smart_text
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
+from datetime import timedelta, datetime, date
+from django.utils.timesince import timesince
 
 # Create your models here.
 
@@ -45,6 +47,8 @@ class PostModel(models.Model):
     publish_date	= models.DateField(auto_now=False, auto_now_add=False, default=timezone.now)
     #author_email	= models.CharField(max_length=240, validators=[validate_author_email, validate_user_email], null=True, blank=True) #custom email validator
     author_email	= models.EmailField(max_length=240, null=True, blank=True) # Default 
+    updated		= models.DateTimeField(auto_now=True)
+    timestamp		= models.DateTimeField(auto_now_add=True)
     #id			= models.IntegerField(primaty_key=True  #auto increments 1, 2, 3, 4
 
 
@@ -74,6 +78,23 @@ class PostModel(models.Model):
 
     def __str__(self):    #python 3
         return smart_text(self.title) #smart_text will convert the string to encoding='utf-8'
+
+    @property
+    def age(self):
+        if self.publish == 'publish':
+            now = datetime.now()
+            publish_time = datetime.combine(
+                                self.publish_date,
+                                datetime.now().min.time()
+                        )
+            try:
+                difference = now - publish_time
+            except:
+                return "Unknown"
+            if difference <= timedelta(minutes=1):
+                return 'just now'
+            return '{time} ago'.format(time= timesince(publish_time).split(', ')[0])
+        return "Not Published"
 
 '''
 python manage.py makemigrations #every time you change models.py, it will set the parameters for db
